@@ -49,6 +49,37 @@ const updateTotals = () => {
     cartValue.textContent = totalQuantity;
 }
 
+// ===== CHECKOUT FUNCTIONALITY =====
+const checkoutBtn = document.getElementById('checkoutBtn');
+
+const handleCheckout = (e) => {
+    e.preventDefault();
+
+    if (cartProducts.length === 0) {
+        alert('Your cart is empty. Add items before checking out.');
+        return;
+    }
+
+    if (!currentUser) {
+        openAuthModal('login');
+        showMessage('login-message', 'Please log in to complete your order.', 'error');
+        return;
+    }
+
+    const total = cartTotal.textContent;
+    alert(`Thanks, ${currentUser.name}! Your order total is ${total}. Your order has been placed.`);
+
+    // Clear cart
+    cartProducts = [];
+    cartList.innerHTML = '';
+    updateTotals();
+    cartTab.classList.remove('cart-tab-active');
+};
+
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', handleCheckout);
+}
+
 // ===== DISPLAY MENU CARDS =====
 const showCards = () => {
     cardList.innerHTML = '';
