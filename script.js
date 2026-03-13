@@ -51,12 +51,31 @@ const updateTotals = () => {
 
 // ===== CHECKOUT FUNCTIONALITY =====
 const checkoutBtn = document.getElementById('checkoutBtn');
+const checkoutMessageEl = document.getElementById('checkout-message');
+
+const showCheckoutMessage = (message, type = 'success') => {
+    if (!checkoutMessageEl) return;
+
+    checkoutMessageEl.textContent = message;
+    checkoutMessageEl.className = `checkout-message ${type}`;
+    checkoutMessageEl.style.display = 'block';
+
+    setTimeout(() => {
+        checkoutMessageEl.style.display = 'none';
+    }, 3000);
+};
+
+const saveOrder = (order) => {
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+};
 
 const handleCheckout = (e) => {
     e.preventDefault();
 
     if (cartProducts.length === 0) {
-        alert('Your cart is empty. Add items before checking out.');
+        showCheckoutMessage('Your cart is empty. Add items before checking out.', 'error');
         return;
     }
 
@@ -67,7 +86,24 @@ const handleCheckout = (e) => {
     }
 
     const total = cartTotal.textContent;
-    alert(`Thanks, ${currentUser.name}! Your order total is ${total}. Your order has been placed.`);
+    const items = Array.from(document.querySelectorAll('.cart-list .item')).map(item => {
+        const name = item.querySelector('.detail h4').textContent;
+        const quantity = parseInt(item.querySelector('.quantity-value').textContent);
+        const priceText = item.querySelector('.item-total').textContent;
+        const price = parseFloat(priceText.replace('$', ''));
+
+        return { name, quantity, price };
+    });
+
+    const order = {
+        user: currentUser,
+        total,
+        items,
+        placedAt: new Date().toISOString(),
+    };
+
+    saveOrder(order);
+    showCheckoutMessage(`Thanks, ${currentUser.name}! Your order total is ${total}.`, 'success');
 
     // Clear cart
     cartProducts = [];
@@ -116,10 +152,11 @@ const addToCart = (product) => {
         return;
     }
 
-    // Add product to cart array
-    cartProducts.push(product);
+    // Add product to cart array with quantity
+    const cartProduct = { ...product, quantity: 1 };
+    cartProducts.push(cartProduct);
 
-    let quantity = 1;
+    let quantity = cartProduct.quantity;
     let price = parseFloat(product.price.replace('$', ''));
 
     const cartItem = document.createElement('div');
@@ -155,6 +192,7 @@ const addToCart = (product) => {
     plusBtn.addEventListener('click', (e) => {
         e.preventDefault();
         quantity++;
+        cartProduct.quantity = quantity;
         quantityValue.textContent = quantity;
         itemTotal.textContent = `$${(price * quantity).toFixed(2)}`;
         updateTotals();
@@ -165,6 +203,7 @@ const addToCart = (product) => {
 
         if (quantity > 1) {
             quantity--;
+            cartProduct.quantity = quantity;
             quantityValue.textContent = quantity;
             itemTotal.textContent = `$${(price * quantity).toFixed(2)}`;
             updateTotals();
