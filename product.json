@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "name": "Spring Roll",
+        "price": "$9.67",
+        "image": "images/-Spring-Rolls.jpg"
+    },
+    {
+        "id": 2,
+        "name": "French Fries",
+        "price": "$10.99",
+        "image": "images/french fries.jfif"
+    },
+    {
+        "id": 3,
+        "name": "Sandwich",
+        "price": "$13.45",
+        "image": "images/sandwich.jpg"
+    },
+    {
+        "id": 4,
+        "name": "Lasagna",
+        "price": "$7.50",
+        "image": "images/-lasagna-.jpg"
+    },
+    {
+        "id": 5,
+        "name": "Masala Dosa",
+        "price": "$6.99",
+        "image": "images/masala dosa.jfif"
+    },
+    {
+        "id": 6,
+        "name": "Noodles",
+        "price": "$16.45",
+        "image": "images/noodles.jpg"
+    },
+    {
+        "id": 7,
+        "name": "Burger",
+        "price": "$7.65",
+        "image": "images/burger.jpg"
+    },
+    {
+        "id": 8,
+        "name": "Pizza",
+        "price": "$9.31",
+        "image": "images/pizza.jpg"
+    }
+]
