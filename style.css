@@ -663,6 +663,42 @@ h3{
     border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
+/* Toast notification */
+.toast{
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    max-width: 90%;
+    min-width: 280px;
+    padding: 1rem 1.4rem;
+    border-radius: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 2000;
+}
+
+.toast.success{
+    background: rgba(46, 204, 113, 0.15);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    color: #27ae60;
+}
+
+.toast.error{
+    background: rgba(231, 76, 60, 0.15);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: #c0392b;
+}
+
+.toast.show{
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 .cart-list .item:nth-child(even){
     background: var(--eye-ball);
 }

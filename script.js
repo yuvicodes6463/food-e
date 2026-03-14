@@ -54,17 +54,33 @@ const updateTotals = () => {
 // ===== CHECKOUT FUNCTIONALITY =====
 const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutMessageEl = document.getElementById('checkout-message');
+const toastEl = document.getElementById('toast');
+let toastTimeout;
+
+const showToast = (message, type = 'success', duration = 4200) => {
+    if (!toastEl) return;
+
+    toastEl.textContent = message;
+    toastEl.className = `toast ${type} show`;
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toastEl.classList.remove('show');
+    }, duration);
+};
 
 const showCheckoutMessage = (message, type = 'success') => {
-    if (!checkoutMessageEl) return;
+    if (checkoutMessageEl) {
+        checkoutMessageEl.textContent = message;
+        checkoutMessageEl.className = `checkout-message ${type}`;
+        checkoutMessageEl.style.display = 'block';
 
-    checkoutMessageEl.textContent = message;
-    checkoutMessageEl.className = `checkout-message ${type}`;
-    checkoutMessageEl.style.display = 'block';
+        setTimeout(() => {
+            checkoutMessageEl.style.display = 'none';
+        }, 3000);
+    }
 
-    setTimeout(() => {
-        checkoutMessageEl.style.display = 'none';
-    }, 3000);
+    showToast(message, type);
 };
 
 const saveOrder = (order) => {
