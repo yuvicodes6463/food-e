@@ -9,6 +9,8 @@ const cartValue = document.querySelector('.cart-value');
 const hamburger = document.querySelector('.hamburger');
 const mobileMenu = document.querySelector('.mobile-menu');
 const bars = document.querySelector('.fa-bars');
+const navbar = document.querySelector('.navbar');
+const searchInput = document.getElementById('searchInput');
 
 // ===== CART FUNCTIONALITY =====
 cartIcon.addEventListener('click', (e) => {
@@ -116,21 +118,37 @@ if (checkoutBtn) {
     checkoutBtn.addEventListener('click', handleCheckout);
 }
 
-// ===== DISPLAY MENU CARDS =====
-const showCards = () => {
+// ===== PRODUCT LIST RENDERING =====
+const showCards = (products = productList) => {
     cardList.innerHTML = '';
-    
-    productList.forEach(product => {
+
+    if (products.length !== productList.length) {
+        // Show results count when filtering
+        const resultsDiv = document.createElement('div');
+        resultsDiv.className = 'search-results-count';
+        resultsDiv.innerHTML = `<p>Found ${products.length} product${products.length !== 1 ? 's' : ''}</p>`;
+        cardList.appendChild(resultsDiv);
+    }
+
+    products.forEach(product => {
         const orderCard = document.createElement('div');
         orderCard.classList.add('order-card');
 
         orderCard.innerHTML = `
             <div class="card-image">
-                <img src="${product.image}" alt="${product.name}" style="width: 15rem; height: auto; filter: drop-shadow(rgba(0, 0, 0, 0.2) 0 10px 10px); display: block; margin: auto;">
+                <img src="${product.image}" alt="${product.name}">
             </div>
-            <h4>${product.name}</h4>
-            <h4 class="price">${product.price}</h4>
-            <a href="#" class="btn card-btn">Add to Cart</a>
+            <div class="card-content">
+                <h4 class="card-title">${product.name}</h4>
+                <h4 class="price">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                    ${product.price.replace('$', '')}
+                </h4>
+                <a href="#" class="btn card-btn">
+                    <i class="fa-solid fa-cart-plus"></i>
+                    Add to Cart
+                </a>
+            </div>
         `;
 
         cardList.appendChild(orderCard);
@@ -141,6 +159,115 @@ const showCards = () => {
             addToCart(product);
         });
     });
+};
+
+const showNoResults = (query) => {
+    cardList.innerHTML = `
+        <div class="no-results">
+            <i class="fa-solid fa-search"></i>
+            <h3>No results found</h3>
+            <p>No products match "${query}"</p>
+            <button class="btn clear-search-btn">Clear Search</button>
+        </div>
+    `;
+
+    // Add event listener to the clear search button
+    const clearBtn = cardList.querySelector('.clear-search-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearSearch);
+    }
+};
+
+const clearSearch = () => {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    filterProducts('');
+    searchInput.focus();
+};
+
+const filterProducts = (query) => {
+    const normalized = query.trim().toLowerCase();
+    const searchWrapper = document.querySelector('.search-wrapper');
+
+    if (!normalized) {
+        showCards();
+        searchWrapper.classList.remove('searching');
+        return;
+    }
+
+    searchWrapper.classList.add('searching');
+
+    // Filter products by name (case-insensitive partial match)
+    const filtered = productList.filter(p =>
+        p.name.toLowerCase().includes(normalized)
+    );
+
+    if (filtered.length === 0) {
+        showNoResults(query);
+    } else {
+        showCards(filtered);
+    }
+
+    // Scroll to menu section to show results
+    const menuSection = document.getElementById('menu-section');
+    if (menuSection) {
+        menuSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+};
+
+// ===== NAVBAR SCROLL & SEARCH =====
+const setupNavbarInteractions = () => {
+    // Animate navbar on scroll
+    if (navbar) {
+        const handleScroll = () => {
+            if (window.scrollY > 10) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+        };
+
+        // Run once on load and then on scroll
+        handleScroll();
+        window.addEventListener('scroll', handleScroll);
+    }
+
+    // Live search on input
+    if (searchInput) {
+        const clearBtn = document.getElementById('clearSearch');
+
+        const handleSearch = (e) => {
+            const value = e.target.value || '';
+            filterProducts(value);
+            // Show/hide clear button
+            if (clearBtn) {
+                clearBtn.style.display = value ? 'block' : 'none';
+            }
+        };
+
+        searchInput.addEventListener('input', handleSearch);
+
+        // Clear button functionality
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                filterProducts('');
+                clearBtn.style.display = 'none';
+                searchInput.focus();
+            });
+        }
+
+        // Prevent form-submit style behaviour on Enter and just filter
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterProducts(searchInput.value || '');
+            }
+        });
+    }
 };
 
 // ===== ADD TO CART FUNCTION =====
@@ -265,6 +392,7 @@ const initApp = () => {
             console.log('Products loaded:', productList.length, 'items');
             showCards();
             setupSmoothScroll();
+            setupNavbarInteractions(); // Move this here so it's called after products are loaded
         })
         .catch(error => {
             console.error('Error loading products:', error);
@@ -510,4 +638,5 @@ const clearForms = () => {
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
     initAuth();
+    // setupNavbarInteractions(); // Moved to after products are loaded
 });
